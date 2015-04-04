@@ -7,7 +7,10 @@ import com.intellij.codeInsight.actions.RearrangeCodeProcessor;
 import com.intellij.codeInsight.actions.ReformatCodeProcessor;
 import com.intellij.openapi.components.ServiceManager;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.vcs.changes.ChangeListManager;
 import com.intellij.psi.PsiFile;
+
+import java.util.NoSuchElementException;
 
 public enum ProcessorFactory {
 
@@ -34,15 +37,25 @@ public enum ProcessorFactory {
     }
 
     private AbstractLayoutCodeProcessor getRearrangeCodeProcessor(AbstractLayoutCodeProcessor processor) {
-        if (null != processor && settings.isRearrange()) {
-            return new RearrangeCodeProcessor(processor, null);
+        if (null != processor && settings.isRearrangeAvailable() && settings.isRearrange()) {
+            try {
+                return new RearrangeCodeProcessor(processor, null);
+            } catch (NoSuchElementException e) {
+                settings.setRearrange(false);
+                settings.setRearrangeAvailable(false);
+                return processor;
+            }
         }
         return processor;
     }
 
     private AbstractLayoutCodeProcessor getReformatCodeProcessor(Project project, PsiFile psiFile) {
         if (settings.isReformat()) {
-            return new ReformatCodeProcessor(project, psiFile, null, settings.isReformatChangedCode());
+            if (null == ChangeListManager.getInstance(project).getChange(psiFile.getVirtualFile())) {
+                return new ReformatCodeProcessor(project, psiFile, null, false);
+            } else {
+                return new ReformatCodeProcessor(project, psiFile, null, settings.isChangedCode());
+            }
         }
         return null;
     }

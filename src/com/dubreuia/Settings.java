@@ -17,9 +17,11 @@ public class Settings implements PersistentStateComponent<Settings> {
 
     private boolean reformat;
 
-    private boolean reformatChangedCode;
+    private boolean changedCode;
 
     private boolean rearrange;
+
+    private transient boolean rearrangeAvailable = true;
 
     public Settings getState() {
         return this;
@@ -53,12 +55,12 @@ public class Settings implements PersistentStateComponent<Settings> {
         this.reformat = reformat;
     }
 
-    public boolean isReformatChangedCode() {
-        return reformatChangedCode;
+    public boolean isChangedCode() {
+        return changedCode;
     }
 
-    public void setReformatChangedCode(boolean reformatChangedCode) {
-        this.reformatChangedCode = reformatChangedCode;
+    public void setChangedCode(boolean changedCode) {
+        this.changedCode = changedCode;
     }
 
     public boolean isRearrange() {
@@ -67,6 +69,14 @@ public class Settings implements PersistentStateComponent<Settings> {
 
     public void setRearrange(boolean rearrange) {
         this.rearrange = rearrange;
+    }
+
+    public boolean isRearrangeAvailable() {
+        return rearrangeAvailable;
+    }
+
+    public void setRearrangeAvailable(boolean rearrangeAvailable) {
+        this.rearrangeAvailable = rearrangeAvailable;
     }
 
 }
